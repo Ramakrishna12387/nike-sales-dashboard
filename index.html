@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nike Sales Intelligence & Analytics Hub</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- PapaParse for fast CSV parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- 1. LOGIN SCREEN -->
+  <div id="loginScreen" class="login-wrapper">
+    <div class="login-card">
+      <div class="brand-header">
+        <i class="fa-solid fa-bolt brand-icon"></i>
+        <h2>NIKE ANALYTICS PORTAL</h2>
+        <p>Sign in to access real-time executive dashboard</p>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="input-group">
+          <label><i class="fa-solid fa-user"></i> Username</label>
+          <input type="text" id="username" placeholder="admin" required autocomplete="off">
+        </div>
+        <div class="input-group">
+          <label><i class="fa-solid fa-lock"></i> Password</label>
+          <input type="password" id="password" placeholder="admin123" required>
+        </div>
+        <button type="submit" class="btn-login">SIGN IN <i class="fa-solid fa-arrow-right"></i></button>
+      </form>
+      <p id="errorMsg" class="error-text hidden">Invalid credentials! Use admin / admin123</p>
+    </div>
+  </div>
+
+  <!-- 2. MAIN DASHBOARD SCREEN -->
+  <div id="dashboardScreen" class="dashboard-wrapper hidden">
+    <!-- Header -->
+    <header class="dash-navbar">
+      <div class="dash-brand">
+        <h1>NIKE SALES DASHBOARD</h1>
+        <span>BETTER DATA | SMARTER DECISIONS | HIGHER GROWTH</span>
+      </div>
+      <div class="dash-actions">
+        <!-- CSV Upload Button -->
+        <label class="btn-action">
+          <i class="fa-solid fa-file-arrow-up"></i> Upload CSV
+          <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileUpload(event)" style="display: none;">
+        </label>
+        <!-- Export PDF -->
+        <button onclick="window.print()" class="btn-action"><i class="fa-solid fa-file-pdf"></i> Export</button>
+        <!-- Logout -->
+        <button onclick="handleLogout()" class="btn-action logout"><i class="fa-solid fa-power-off"></i></button>
+      </div>
+    </header>
+
+    <!-- Controls & Slicers Bar -->
+    <section class="controls-bar">
+      <div class="slicer-group">
+        <span class="control-label"><i class="fa-solid fa-filter"></i> Category Slicer:</span>
+        <button class="slicer-btn active" onclick="filterCategory('All', this)">All</button>
+        <button class="slicer-btn" onclick="filterCategory('Men', this)">Men</button>
+        <button class="slicer-btn" onclick="filterCategory('Women', this)">Women</button>
+        <button class="slicer-btn" onclick="filterCategory('Kids', this)">Kids</button>
+      </div>
+      <div class="active-tag" id="currentViewBadge">Viewing: All Categories</div>
+    </section>
+
+    <!-- KPI Cards Row -->
+    <section class="kpi-row">
+      <div class="kpi-card highlight">
+        <span class="kpi-label">TOTAL PROFIT</span>
+        <h2 class="kpi-value" id="kpiProfit">₹ 1.13M</h2>
+        <small class="kpi-subtext" id="kpiProfitGrowth"><i class="fa-solid fa-arrow-trend-up"></i> +14.2% Growth</small>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">TOTAL REVENUE</span>
+        <h2 class="kpi-value" id="kpiRevenue">₹ 4.82M</h2>
+        <small class="kpi-subtext">Across All Regions</small>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">TOTAL UNITS SOLD</span>
+        <h2 class="kpi-value" id="kpiUnits">84,320</h2>
+        <small class="kpi-subtext">Verified Orders</small>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">PROFIT MARGIN</span>
+        <h2 class="kpi-value" id="kpiMargin">23.4%</h2>
+        <small class="kpi-subtext">Target: 20%</small>
+      </div>
+    </section>
+
+    <!-- Charts Grid Row 1 -->
+    <section class="charts-grid-3">
+      <div class="chart-box">
+        <h3><i class="fa-solid fa-chart-column"></i> Profit by Product Line</h3>
+        <canvas id="profitByLineChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3><i class="fa-solid fa-chart-pie"></i> Profit by Discount Tier</h3>
+        <canvas id="discountDonutChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3><i class="fa-solid fa-chart-pie"></i> Revenue by Top Sneakers</h3>
+        <canvas id="productPieChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Charts Grid Row 2 -->
+    <section class="charts-grid-2">
+      <div class="chart-box">
+        <h3><i class="fa-solid fa-chart-line"></i> Revenue Trend (Monthly Progression)</h3>
+        <canvas id="revenueTrendChart"></canvas>
+      </div>
+
+      <div class="chart-box table-box">
+        <h3><i class="fa-solid fa-table-list"></i> Regional Sales Breakdown</h3>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Region</th>
+                <th>Online (₹)</th>
+                <th>Retail (₹)</th>
+              </tr>
+            </thead>
+            <tbody id="regionTableBody">
+              <!-- Dynamic Rows inserted via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
